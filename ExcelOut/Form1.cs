@@ -1,11 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using Exel = Microsoft.Office.Interop.Excel;
 
@@ -33,26 +26,39 @@ namespace ExcelOut
 
             if (!(saveFileDialog.ShowDialog() == DialogResult.OK))
             {
-                MessageBox.Show("error"); return;
+                MessageBox.Show("error");
+                return;
             }
             string FilePath = saveFileDialog.FileName;
+            Exel.Application application;
 
-            Exel.Application application = new Exel.Application();
-
-            Exel.Workbook workbook = application.Workbooks.Add();
-            Exel.Worksheet worksheet;
-            worksheet = workbook.ActiveSheet;
-            worksheet.Name = "лист1";
-
-            for (int i = 1; i <= dataGridView1.RowCount; i++)
+            try
             {
-                for (int j = 1; j <= dataGridView1.ColumnCount; j++)
+
+                application = new Exel.Application();
+
+                Exel.Workbook workbook = application.Workbooks.Add();
+                Exel.Worksheet worksheet;
+                worksheet = workbook.ActiveSheet;
+                worksheet.Name = "лист1";
+
+                for (int i = 1; i <= dataGridView1.RowCount; i++)
                 {
-                    worksheet.Cells[i, j] = dataGridView1.Rows[i - 1].Cells[j - 1];
+                    for (int j = 1; j <= dataGridView1.ColumnCount; j++)
+                    {
+                        worksheet.Cells[i, j] = dataGridView1.Rows[i - 1].Cells[j - 1].Value;
+                    }
                 }
+
+                application.Application.ActiveWorkbook.SaveAs(FilePath);
+                application.Quit();
+                MessageBox.Show("сохранение  удалось");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
             }
 
-            application.Application.ActiveWorkbook.SaveAs(FilePath);
         }
     }
 }
